@@ -1,0 +1,292 @@
+<html lang="jp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&display=swap" rel="stylesheet">
+
+    <title>たべものクリッカー！</title>
+    <style>
+        body{
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            height: 100vh;
+            &>header{
+                padding: 8px;
+                background-color: var(--color-fg-primary);
+                color: var(--color-bg-primary);
+                display: flex;
+                &>div:first-child{
+                    flex-grow: 1;
+                    font-size: 2em;
+                }
+            }
+            &>main{
+                flex-grow: 1;
+                padding: 8px;
+                background-color: var(--color-bg-primary);
+                color: var(--color-fg-primary);
+                display: flex;
+            }
+        }
+        * {
+            font-family: "Hachi Maru Pop", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            /*
+             *Palette from https://www.canva.com/colors/color-palettes/cupcake-delight/ 
+             */
+            
+            /*Champagne*/
+            --color-bg-primary:#EBE0D0;
+
+            /*Hot Pink*/
+            --color-bg-secondary:#EC9EC0;
+
+            /*Fuchsia*/
+            --color-fg-primary:#FF0080;
+
+            /*Pink*/
+            --color-fg-secondary:#A91B60;
+        }
+        .ComponentClickArea{
+            image-rendering: pixelated;
+            width: 100%;
+            max-width: 320px;
+            transition: transform .1s ease;
+            user-select: none;
+        }
+        .click-pain{
+            flex-grow: 2;
+            display: flex;
+            flex-direction: column;
+            div{
+                flex-grow: 1;
+            }
+            .click-info-wrapper{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+
+                .ComponentClickInfo{
+                    display: inline;
+                    width: min-content;
+                    border-radius: 16px;
+                    background-color: var(--color-bg-secondary);
+                    padding: 4px;
+                    .coin-info{
+                        font-size: 1.5em;
+                    }
+                    .click-level-info{
+                        display: flex;
+                        flex-wrap: wrap;
+                    }
+                }
+            }
+            .click-area{
+                flex-grow: 0;
+                text-align: center;
+                &:hover>.ComponentClickArea{
+                    transform: scale(1.2);
+                }
+                &:active>.ComponentClickArea{
+                    transform: scale(0.9);
+                }
+            }
+        }
+        .store-pain{
+            flex-grow: 5;
+            overflow-y: scroll;
+            height: calc(100vh - (16px + 4em));
+            .store-items{
+                margin: 16px;
+                border-style: dashed solid;
+                border-width: 16px;
+                border-image: url('./assets/border.png') 8 round;
+                image-rendering: pixelated;
+                border-radius: 18px;
+                display: none;
+                &.available-item{
+                    display: flex;
+                }
+                >img{
+                    image-rendering: pixelated;
+                    width: 7em;
+                    height: 7em;
+                }
+                >div{
+                    flex-grow: 1;
+                    display: flex;
+                    flex-direction: column;
+                    >.store-item-title{
+                        font-size: 3em;
+                    }
+                    >.store-item-desc{
+                        font-size: 1.5em;
+                    }
+                }
+                >table{
+                    min-width: 20em;
+                    border: none;
+                    color: var(--color-fg-secondary);
+                }
+            }
+        }
+        .coin-info{
+            min-width: 7em;
+        }
+        @media screen and (max-width: 1024px){
+            main{
+                flex-direction: column;
+            }
+            header{
+                flex-direction: column;
+            }
+            .store-pain{
+                height: unset;
+                overflow-y: auto;
+                & .store-items{
+                    flex-direction: column;
+                }
+            }
+            .coin-info{
+                min-width: unset;
+            }
+        }
+    </style>
+    <script>
+    document.addEventListener("DOMContentLoaded",()=>{
+        let level=0
+        let cps=BigInt(0)
+        let cpc=BigInt(1)
+        let coins=BigInt(0)
+
+        let clickAreaCandicates=[]
+    
+        const storeItems=[
+            {level:0,name:"あめ",asset:"assets/あめ.png",cost:100,cpc:1,cps:0.1,description:"おいしい飴です！"},
+            {level:1,name:"クッキー",asset:"assets/クッキー.png",cost:500,cpc:3,cps:0.3,description:"美味しいクッキーです！"},
+            {level:2,name:"ケーキ",asset:"assets/ケーキ.png",cost:2500,cpc:5,cps:0.5,description:"甘いケーキです！"},
+            {level:3,name:"アイスクリーム",asset:"assets/アイスクリーム.png",cost:6500,cpc:7,cps:1,description:"クールなアイスクリームです！"},
+            {level:4,name:"ドーナツ",asset:"assets/ドーナツ.png",cost:10000,cpc:10,cps:3,description:"美味しいドーナツです！"},
+            {level:5,name:"チョコレート",asset:"assets/チョコレート.png",cost:25000,cpc:25,cps:5,description:"濃厚なチョコレートです！"},
+            {level:6,name:"ロリポップ",asset:"assets/ロリポップ.png",cost:40000,cpc:100,cps:10,description:"甘いロリポップです！"},
+            {level:7,name:"ブラウニー",asset:"assets/ブラウニー.png",cost:75000,cpc:250,cps:20,description:"贅沢なブラウニーです！"},
+            {level:8,name:"パンケーキ",asset:"assets/パンケーキ.png",cost:150000,cpc:500,cps:50,description:"ふわふわのパンケーキです！"},
+            {level:9,name:"ワッフル",asset:"assets/ワッフル.png",cost:250000,cpc:700,cps:100,description:"外はサクサク、中はモッチリなワッフルです！"},
+            {level:10,name:"ジュース",asset:"assets/ジュース.png",cost:400000,cpc:1000,cps:200,description:"新鮮なフルーツで作られた健康的なジュースです！"},
+        ]
+
+        const itemCounts=[
+        ]
+
+        const levelUp=()=>{
+            level++
+            document.querySelectorAll(".store-items").forEach((e)=>{
+                lv=e.dataset.level*1
+                if(level>=lv+1){
+                    e.classList.add("available-item")
+                }
+            })
+            clickAreaCandicates=storeItems.slice(0, Math.max(level-1,1))
+        }
+
+        const $coinValue=document.getElementById("coin-value")
+        const coinUpdate=()=>{
+            $coinValue.textContent=coins
+        }
+        const costUpdate=(id)=>{
+            itemCounts[id].cost=Math.floor(storeItems[id].cost*(1.15**(itemCounts[id].count)))
+            itemCounts[id].cps=storeItems[id].cps*itemCounts[id].count
+            itemCounts[id].cpc=storeItems[id].cpc*itemCounts[id].count
+
+            new_cps=0
+            itemCounts.forEach((e)=>{
+                new_cps+=e.cps
+            })
+            new_cpc=1
+            itemCounts.forEach((e)=>{
+                new_cpc+=e.cpc
+            })
+            cps=BigInt(Math.floor(new_cps))
+            cpc=BigInt(new_cpc)
+            document.getElementById("cps-value").textContent=cps
+            document.getElementById("cpc-value").textContent=cpc
+            document.querySelector(`.store-items[data-level="${id}"] .store-item-cost`).textContent=itemCounts[id].cost
+            document.querySelector(`.store-items[data-level="${id}"] .store-item-count`).textContent=itemCounts[id].count
+        }
+
+        window.buy=(id)=>{
+            
+            if(!itemCounts[id]){
+                if(storeItems[id].cost>coins){
+                    return
+                }
+                itemCounts[id]={count:0,cps:0,cpc:0,cost:storeItems[id].cost}
+                levelUp()
+            }
+            if(itemCounts[id].cost>coins){return}
+            coins-=BigInt(itemCounts[id].cost)
+            itemCounts[id].count++
+            costUpdate(id)
+            coinUpdate()
+        }
+
+
+        storeItems.forEach((e)=>{
+            node=document.createElement("div")
+            node.classList.add("store-items")
+            node.dataset.level=e.level
+            node.innerHTML=`<img src="${e.asset}"><div><div class="store-item-title">${e.name}</div><div class="store-item-desc">${e.description}</div></div><table><tr><th>CPC</th><td>${e.cpc}</td></tr><tr><th>CPS</th><td>${e.cps}</td></tr><tr><th>価格</th><td class="store-item-cost">${e.cost}</td></tr><tr><th>所持数</th><td class="store-item-count">0</td></tr></table><button type="button" class="store-buy" onclick="buy(${e.level})">買う</button>`
+            document.getElementById("$StoreItemList").appendChild(node)
+        })
+
+        const $ClickArea=document.getElementById("$ClickArea")
+        $ClickArea.addEventListener("click",()=>{
+            coins+=cpc
+            coinUpdate()
+            $ClickArea.src=clickAreaCandicates[Math.floor(Math.random() * clickAreaCandicates.length)].asset
+        })
+        levelUp()
+        setInterval(()=>{
+            coins+=cps
+            coinUpdate()
+        },1000)
+    })
+    </script>
+</head>
+<body>
+    <header>
+        <div>たべものクリッカー！</div>
+        <div>
+            <div>Original idea by <abbr title="Super Thanks!" onclick="alert(`Super Thanks to にゃんころぎつね!`)">にゃんころぎつね</abbr></div>
+            <div>Made by びーよん！</div>
+        </div>
+    </header>
+    <main>
+        <div class="click-pain">
+            <div class="click-info-wrapper">
+                <div class="ComponentClickInfo" id="$ClickInfo">
+                    <div class="coin-info">コイン:<span id="coin-value">0</span></div>
+                    <div class="click-level-info">
+                        <div>CPS:<abbr title="1秒あたりの自動収入です。小数点以下は切り捨てです。" id="cps-value">0</abbr></div>
+                        <div>CPC:<abbr title="1クリックあたりの収入です。" id="cpc-value">1</abbr></div>
+                    </div>
+                </div>
+            </div>
+            <div class="click-area">
+                <img src="assets/あめ.png" class="ComponentClickArea" id="$ClickArea">
+            </div>
+            <div></div>
+        </div>
+        <div class="store-pain">
+            <div class="ComponentStoreItemList" id="$StoreItemList">
+
+            </div>
+        </div>
+    </main>
+</body>
+</html>
