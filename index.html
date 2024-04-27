@@ -296,16 +296,19 @@
 
         let itemCounts=[
         ]
-
-        const levelUp=()=>{
-            level++
+        const levelFix=()=>{
             document.querySelectorAll(".store-items").forEach((e)=>{
                 lv=e.dataset.level*1
                 if(level>=lv+1){
                     e.classList.add("available-item")
+                    costUpdate(id)
                 }
             })
             clickAreaCandicates=storeItems.slice(0, Math.max(level-1,1))
+        }
+        const levelUp=()=>{
+            level++
+            levelFix()
         }
 
         const $coinValue=document.getElementById("coin-value")
@@ -380,6 +383,8 @@
                 itemCounts=savedata.itemCounts
                 coins=BigInt(savedata.coins)
                 level=savedata.level
+
+                levelFix()
             
                 document.getElementById("$SaveInfoLastSaveTime").textContent=document.getElementById("$SaveInfoSaveTime").textContent=new Date(savedata.timestamp*1000).toString()
                 document.getElementById("$SaveInfoLastSaveCoin").textContent=coins
