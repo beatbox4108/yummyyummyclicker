@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="jp">
 <head>
     <meta charset="UTF-8">
@@ -29,6 +30,43 @@
                 background-color: var(--color-bg-primary);
                 color: var(--color-fg-primary);
                 display: flex;
+            }
+            &.loading{
+                &>.loading-overlay{
+                    display: flex;
+                }
+                &>main{
+                    display: none;
+                }
+            }
+        }
+        .loading-overlay{
+            display: none;
+            flex-direction: column;
+            text-align: center;
+            flex-grow: 1;
+            padding: auto;
+            align-items: center;
+            justify-content: space-evenly;
+            background-color: var(--color-bg-secondary);
+            color: var(--color-fg-primary);
+            div{
+                font-size: 3em;
+                >span{
+                    display: inline-block;
+                }
+            }
+            img{
+                height: 20em;
+                image-rendering: pixelated;
+                max-width: 100vw;
+                max-height: 100vh;
+                aspect-ratio: 1/1;
+                margin: 16px;
+                border-style: dashed solid;
+                border-width: 16px;
+                border-image: url('./assets/border.png') 8 round;
+                image-rendering: pixelated;
             }
         }
         * {
@@ -158,7 +196,7 @@
         }
     </style>
     <script>
-    document.addEventListener("DOMContentLoaded",()=>{
+    window.addEventListener("load",()=>{
         let level=0
         let cps=BigInt(0)
         let cpc=BigInt(1)
@@ -180,7 +218,7 @@
             {level:10,name:"ジュース",asset:"assets/ジュース.png",cost:400000,cpc:1000,cps:200,description:"新鮮なフルーツで作られた健康的なジュースです！"},
         ]
 
-        const itemCounts=[
+        let itemCounts=[
         ]
 
         const levelUp=()=>{
@@ -255,10 +293,28 @@
             coins+=cps
             coinUpdate()
         },1000)
+        const save=()=>{
+            localStorage.setItem("clickersave",JSON.stringify({itemCounts:itemCounts,coins:coins.toString(),timestamp:Date.now()}))
+        }
+        const load=()=>{
+            if(localStorage.getItem("clickersave")){
+                savedata=JSON.parse(localStorage.getItem("clickersave"))
+                itemCounts=savedata.itemCounts
+                coins=BigInt(savedata.coins)
+            }else{
+                itemCounts=[]
+                coins=BigInt(0)
+            }
+        }
+        window.addEventListener("beforeunload",(e)=>{
+            save()
+        })
+        load()
+        setTimeout(()=>{document.body.classList.remove("loading")},1000)
     })
     </script>
 </head>
-<body>
+<body class="loading">
     <header>
         <div>たべものクリッカー！</div>
         <div>
@@ -266,6 +322,10 @@
             <div>Made by びーよん！</div>
         </div>
     </header>
+    <div class="loading-overlay">
+        <div><span>なう</span> <span>ろーでぃんぐ...</span></div>
+        <img src="./assets/あめ.png">
+    </div>
     <main>
         <div class="click-pain">
             <div class="click-info-wrapper">
