@@ -6,7 +6,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <title>たべものクリッカー！</title>
     <style>
         body{
@@ -103,37 +103,69 @@
             div{
                 flex-grow: 1;
             }
-            .click-info-wrapper{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-
-                .ComponentClickInfo{
-                    display: inline;
-                    width: min-content;
-                    border-radius: 16px;
-                    background-color: var(--color-bg-secondary);
-                    padding: 4px;
-                    .coin-info{
-                        font-size: 1.5em;
-                    }
-                    .click-level-info{
-                        display: flex;
-                        flex-wrap: wrap;
-                    }
+            .click-info-wrapper .ComponentClickInfo{
+                .coin-info{
+                    font-size: 1.5em;
+                }
+                .click-level-info{
+                    display: flex;
+                    flex-wrap: wrap;
                 }
             }
-            .click-area{
-                flex-grow: 0;
-                text-align: center;
-                &:hover>.ComponentClickArea{
-                    transform: scale(1.2);
-                }
-                &:active>.ComponentClickArea{
-                    transform: scale(0.9);
-                }
+        }
+        .link-list{
+            display: flex;
+            font-size: 1.5em;
+        }
+        .click-info-wrapper, .link-list-wrapper{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            .ComponentClickInfo,.link-list{
+                display: inline;
+                width: min-content;
+                border-radius: 16px;
+                background-color: var(--color-bg-secondary);
+                padding: 4px;
             }
+        }
+        .click-area{
+            flex-grow: 0;
+            text-align: center;
+            &:hover>.ComponentClickArea{
+                transform: scale(1.2);
+            }
+            &:active>.ComponentClickArea{
+                transform: scale(0.9);
+            }
+        }
+        .settings-pain{
+            flex-grow: 5;
+            display: none;
+            margin: 16px;
+            border-style: dashed solid;
+            border-width: 16px;
+            border-image: url('./assets/border.png') 8 round;
+            image-rendering: pixelated;
+            padding: 1em;
+            >header{
+                font-size: 2em;
+                font-weight: 900;
+            }
+            label{
+                display: block;
+            }
+        }
+        .settings-mode{
+            
+            .store-pain{
+                display: none;
+            }
+            .settings-pain{
+                display: block;
+            }
+            
         }
         .store-pain{
             flex-grow: 5;
@@ -170,8 +202,43 @@
                     min-width: 20em;
                     border: none;
                     color: var(--color-fg-secondary);
+                    th{
+                        width: 4em;
+                    }
                 }
             }
+        }
+        table{
+            th,td{
+                text-align: left;
+            }
+        }
+        button,input::-webkit-file-upload-button{
+            margin: 4px;
+            background-color: var(--color-bg-primary);
+            color: var(--color-fg-secondary);
+            border-width: 1px;
+            border-style: solid;
+            border-color: var(--color-fg-secondary);
+            box-sizing: border-box;
+            border-radius: 4px;
+            padding: 4px;
+            transition: background-color .25s ease, border-color .25s ease, color .25s ease;
+            &:focus, &:hover{
+                color: var(--color-bg-primary);
+                border-color: var(--color-bg-primary);
+                background-color: var(--color-fg-secondary);
+            }
+        }
+        input[type="file"]{
+            :is(&:focus, &:hover)::-webkit-file-upload-button{
+                color: var(--color-bg-primary);
+                border-color: var(--color-bg-primary);
+                background-color: var(--color-fg-secondary);
+            }
+        }
+        .bi-github{
+            color:#171515;
         }
         .coin-info{
             min-width: 7em;
@@ -201,6 +268,7 @@
         let cps=BigInt(0)
         let cpc=BigInt(1)
         let coins=BigInt(0)
+        let save_on_unload=true
 
         let clickAreaCandicates=[]
     
@@ -273,6 +341,7 @@
             coinUpdate()
         }
 
+        window.pref={}
 
         storeItems.forEach((e)=>{
             node=document.createElement("div")
@@ -294,7 +363,8 @@
             coinUpdate()
         },1000)
         const save=()=>{
-            localStorage.setItem("clickersave",JSON.stringify({itemCounts:itemCounts,coins:coins.toString(),level:level,timestamp:Date.now()}))
+            localStorage.setItem("clickersave",JSON.stringify({itemCounts:itemCounts,coins:coins.toString(),level:level,timestamp:Date.now()/1000}))
+            document.getElementById("$SaveInfoSaveTime").textContent=Date()
         }
         const load=()=>{
             if(localStorage.getItem("clickersave")){
@@ -302,13 +372,58 @@
                 itemCounts=savedata.itemCounts
                 coins=BigInt(savedata.coins)
                 level=savedata.level
+            
+                document.getElementById("$SaveInfoLastSaveTime").textContent=document.getElementById("$SaveInfoSaveTime").textContent=new Date(savedata.timestamp*1000).toString()
+                document.getElementById("$SaveInfoLastSaveCoin").textContent=coins
+                document.getElementById("$SaveInfoLastSaveLevel").textContent=level-1
             }else{
                 itemCounts=[]
                 coins=BigInt(0)
             }
         }
-        window.addEventListener("beforeunload",(e)=>{
+        window.saveutil={}
+        saveutil.save=save
+        saveutil.load=load
+        saveutil.clear=()=>{
+            save_on_unload=false
+            if(confirm("セーブデータを削除してもよろしいですか?")){
+                if(confirm("この操作で次のデータが削除されます。\n- コイン、たべものを含む全てのゲームデータ\n次のデータは残ります。\n- 設定\n続行しますか?\nこの操作はバックアップをしていない限り元に戻せません。")){
+                    localStorage.removeItem("clickersave")
+                    if(confirm("データの削除が完了しました。このまま新しいゲームを開始しますか?")){
+                        location.reload(true)
+                    }else{
+                        window.close()
+                    }
+                }
+            }
+        }
+        saveutil.export=()=>{
+            const elem=document.createElement("a")
             save()
+            elem.href=URL.createObjectURL(new Blob([window.btoa(localStorage.getItem("clickersave"))], { "type" : "text/plain" }))
+            elem.download="たべものクリッカーのセーブ.ymcsave"
+            elem.click()
+        }
+        saveutil.import=(e)=>{
+            if(e.files.length!=0){
+                const reader=new FileReader()
+                reader.readAsText(e.files[0])
+                reader.addEventListener("load",()=>{
+                    if(confirm("現在のセーブを置き換える前に、現在のデータをエクスポートしますか?")){
+                        saveutil.export()
+                    }
+                    localStorage.setItem("clickersave",atob(reader.result))
+                    save_on_unload=false
+                    location.reload()
+                })
+            }
+        }
+        
+        document.getElementById("$PreferenceToggle").addEventListener("click",()=>{
+            document.body.classList.toggle("settings-mode")
+        })
+        window.addEventListener("beforeunload",(e)=>{
+            if(save_on_unload){save()}
         })
         load()
         setTimeout(()=>{document.body.classList.remove("loading")},1000)
@@ -341,12 +456,44 @@
             <div class="click-area">
                 <img src="assets/あめ.png" class="ComponentClickArea" id="$ClickArea">
             </div>
-            <div></div>
+            <div class="link-list-wrapper">
+                <div class="link-list">
+                    <a href="https://github.com/beatbox4108/yummyyummyclicker" class="bi bi-github"></a>
+                    <i id="$PreferenceToggle" class="bi bi-sliders2"></i>
+                </div>
+            </div>
         </div>
         <div class="store-pain">
             <div class="ComponentStoreItemList" id="$StoreItemList">
 
             </div>
+        </div>
+        <div class="settings-pain">
+            <header>設定</header>
+            <section>
+                <h3>セーブデータ</h3>
+                <fieldset>
+                    <legend>今回のセッションをロードしたセーブデータ</legend>
+                    <table>
+                        <tr><th>保存された時間</th><td id="$SaveInfoLastSaveTime">N/A</td></tr>
+                        <tr><th>コイン</th><td id="$SaveInfoLastSaveCoin">N/A</td></tr>
+                        <tr><th>レベル</th><td id="$SaveInfoLastSaveLevel">N/A</td></tr>
+                    </table>
+                </fieldset>
+                <fieldset>
+                    <legend>セーブデータの管理</legend>
+                    <table>
+                        <tr><th>最終保存</th><td id="$SaveInfoSaveTime">N/A</td></tr>
+                        <tr><th>セーブデータをエクスポート</th><td><button type="button" onclick="saveutil.export()">エクスポート</button></td></tr>
+                        <tr><th>セーブデータをインポート</th><td><input type="file" oninput="saveutil.import(this)"></td></tr>
+                    </table>
+                </fieldset>
+                <div>
+                    <button type="button" onclick="saveutil.clear()">セーブデータをリセット</button>
+                    <button type="button" onclick="saveutil.save()">直ちにセーブ</button>
+                    <button type="button" onclick="saveutil.load()">直ちにロード</button>
+                </div>
+            </section>
         </div>
     </main>
 </body>
