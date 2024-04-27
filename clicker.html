@@ -294,13 +294,14 @@
             coinUpdate()
         },1000)
         const save=()=>{
-            localStorage.setItem("clickersave",JSON.stringify({itemCounts:itemCounts,coins:coins.toString(),timestamp:Date.now()}))
+            localStorage.setItem("clickersave",JSON.stringify({itemCounts:itemCounts,coins:coins.toString(),level:level,timestamp:Date.now()}))
         }
         const load=()=>{
             if(localStorage.getItem("clickersave")){
                 savedata=JSON.parse(localStorage.getItem("clickersave"))
                 itemCounts=savedata.itemCounts
                 coins=BigInt(savedata.coins)
+                level=savedata.level
             }else{
                 itemCounts=[]
                 coins=BigInt(0)
