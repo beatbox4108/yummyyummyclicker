@@ -296,20 +296,6 @@
 
         let itemCounts=[
         ]
-        const levelFix=()=>{
-            document.querySelectorAll(".store-items").forEach((e)=>{
-                lv=e.dataset.level*1
-                if(level>=lv+1){
-                    e.classList.add("available-item")
-                    costUpdate(id)
-                }
-            })
-            clickAreaCandicates=storeItems.slice(0, Math.max(level-1,1))
-        }
-        const levelUp=()=>{
-            level++
-            levelFix()
-        }
 
         const $coinValue=document.getElementById("coin-value")
         const coinUpdate=()=>{
@@ -334,6 +320,22 @@
             document.getElementById("cpc-value").textContent=cpc
             document.querySelector(`.store-items[data-level="${id}"] .store-item-cost`).textContent=itemCounts[id].cost
             document.querySelector(`.store-items[data-level="${id}"] .store-item-count`).textContent=itemCounts[id].count
+        }
+
+        const levelFix=()=>{
+            document.querySelectorAll(".store-items").forEach((e)=>{
+                lv=e.dataset.level*1
+                if(level>=lv+1){
+                    e.classList.add("available-item")
+                    console.log(level,lv)
+                    if(level-1>=lv+1){costUpdate(lv)}
+                }
+            })
+            clickAreaCandicates=storeItems.slice(0, Math.max(level-1,1))
+        }
+        const levelUp=()=>{
+            level++
+            levelFix()
         }
 
         window.buy=(id)=>{
@@ -368,7 +370,6 @@
             coinUpdate()
             $ClickArea.src=clickAreaCandicates[Math.floor(Math.random() * clickAreaCandicates.length)].asset
         })
-        levelUp()
         setInterval(()=>{
             coins+=cps
             coinUpdate()
@@ -383,7 +384,6 @@
                 itemCounts=savedata.itemCounts
                 coins=BigInt(savedata.coins)
                 level=savedata.level
-
                 levelFix()
             
                 document.getElementById("$SaveInfoLastSaveTime").textContent=document.getElementById("$SaveInfoSaveTime").textContent=new Date(savedata.timestamp*1000).toString()
@@ -392,6 +392,7 @@
             }else{
                 itemCounts=[]
                 coins=BigInt(0)
+                levelUp()
             }
         }
         window.saveutil={}
