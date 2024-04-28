@@ -207,13 +207,24 @@
                     }
                 }
                 >table{
-                    min-width: 20em;
+                    min-width: 15em;
                     border: none;
                     color: var(--color-fg-secondary);
                     th{
                         width: 4em;
                     }
                 }
+            }
+        }
+        & .settings-table{
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            grid-template-rows: 1fr;
+            & .table-header{
+                color: var(--color-fg-primary);
+            }
+            & .table-cell{
+                color: var(--color-fg-secondary);
             }
         }
         table{
@@ -267,6 +278,14 @@
             }
             .coin-info{
                 min-width: unset;
+            }
+            
+            & .settings-table{
+                display: flex;
+                flex-direction: column;
+                & .table-cell{
+                    margin-left: 2em;
+                }
             }
         }
     </style>
@@ -488,19 +507,22 @@
                 <h3>セーブデータ</h3>
                 <fieldset>
                     <legend>今回のセッションをロードしたセーブデータ</legend>
-                    <table>
-                        <tr><th>保存された時間</th><td id="$SaveInfoLastSaveTime">N/A</td></tr>
-                        <tr><th>コイン</th><td id="$SaveInfoLastSaveCoin">N/A</td></tr>
-                        <tr><th>レベル</th><td id="$SaveInfoLastSaveLevel">N/A</td></tr>
-                    </table>
+                    <div class="settings-table">
+                        <div class="table-header">保存された時間</div>
+                        <div class="table-cell" id="$SaveInfoLastSaveTime">N/A</div>
+                        <div class="table-header">コイン</div>
+                        <div class="table-cell" id="$SaveInfoLastSaveCoin">N/A</div>
+                        <div class="table-header">レベル</div>
+                        <div class="table-cell" id="$SaveInfoLastSaveLevel">N/A</div>
+                    </div>
                 </fieldset>
                 <fieldset>
                     <legend>セーブデータの管理</legend>
-                    <table>
-                        <tr><th>最終保存</th><td id="$SaveInfoSaveTime">N/A</td></tr>
-                        <tr><th>セーブデータをエクスポート</th><td><button type="button" onclick="saveutil.export()">エクスポート</button></td></tr>
-                        <tr><th>セーブデータをインポート</th><td><input type="file" oninput="saveutil.import(this)"></td></tr>
-                    </table>
+                    <div class="settings-table">
+                        <div div class="table-header">最終保存</div><div class="table-cell" id="$SaveInfoSaveTime">N/A</div>
+                        <div div class="table-header">セーブデータをエクスポート</div><div class="table-cell"><button type="button" onclick="saveutil.export()">エクスポート</button></div>
+                        <div div class="table-header">セーブデータをインポート</div><div class="table-cell"><input type="file" oninput="saveutil.import(this)"></div>
+                    </div>
                 </fieldset>
                 <div>
                     <button type="button" onclick="saveutil.clear()">セーブデータをリセット</button>
