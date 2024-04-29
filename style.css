@@ -1,0 +1,275 @@
+body{
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    height: 100vh;
+    &>header{
+        padding: 8px;
+        background-color: var(--color-fg-primary);
+        color: var(--color-bg-primary);
+        display: flex;
+        &>div:first-child{
+            flex-grow: 1;
+            font-size: 2em;
+        }
+    }
+    &>main{
+        flex-grow: 1;
+        padding: 8px;
+        background-color: var(--color-bg-primary);
+        color: var(--color-fg-primary);
+        display: flex;
+    }
+    &.loading{
+        &>.loading-overlay{
+            display: flex;
+        }
+        &>main{
+            display: none;
+        }
+    }
+}
+a{
+    color: unset;
+}
+.loading-overlay{
+    display: none;
+    flex-direction: column;
+    text-align: center;
+    flex-grow: 1;
+    padding: auto;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-fg-primary);
+    div{
+        font-size: 3em;
+        >span{
+            display: inline-block;
+        }
+    }
+    img{
+        height: 20em;
+        image-rendering: pixelated;
+        max-width: 100vw;
+        max-height: 100vh;
+        aspect-ratio: 1/1;
+        margin: 16px;
+        border-style: dashed solid;
+        border-width: 16px;
+        border-image: url('./assets/border.png') 8 round;
+        image-rendering: pixelated;
+    }
+}
+* {
+    font-family: "Hachi Maru Pop", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    /*
+     *Palette from https://www.canva.com/colors/color-palettes/cupcake-delight/ 
+     */
+    
+    /*Champagne*/
+    --color-bg-primary:#EBE0D0;
+
+    /*Hot Pink*/
+    --color-bg-secondary:#EC9EC0;
+
+    /*Fuchsia*/
+    --color-fg-primary:#FF0080;
+
+    /*Pink*/
+    --color-fg-secondary:#A91B60;
+}
+.ComponentClickArea{
+    image-rendering: pixelated;
+    width: 100%;
+    max-width: 320px;
+    transition: transform .1s ease;
+    user-select: none;
+}
+.click-pain{
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    div{
+        flex-grow: 1;
+    }
+    .click-info-wrapper .ComponentClickInfo{
+        .coin-info{
+            font-size: 1.5em;
+        }
+        .click-level-info{
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+}
+.link-list{
+    display: flex;
+    font-size: 1.5em;
+}
+.click-info-wrapper, .link-list-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    .ComponentClickInfo,.link-list{
+        display: inline;
+        width: min-content;
+        border-radius: 16px;
+        background-color: var(--color-bg-secondary);
+        padding: 4px;
+    }
+}
+.click-area{
+    flex-grow: 0;
+    text-align: center;
+    &:hover>.ComponentClickArea{
+        transform: scale(1.2);
+    }
+    &:active>.ComponentClickArea{
+        transform: scale(0.9);
+    }
+}
+.settings-pain{
+    flex-grow: 5;
+    display: none;
+    margin: 16px;
+    border-style: dashed solid;
+    border-width: 16px;
+    border-image: url('./assets/border.png') 8 round;
+    image-rendering: pixelated;
+    padding: 1em;
+    >header{
+        font-size: 2em;
+        font-weight: 900;
+    }
+    label{
+        display: block;
+    }
+}
+.settings-mode{
+    
+    .store-pain{
+        display: none;
+    }
+    .settings-pain{
+        display: block;
+    }
+    
+}
+.store-pain{
+    flex-grow: 5;
+    overflow-y: scroll;
+    height: calc(100vh - (16px + 4em));
+    .store-items{
+        margin: 16px;
+        border-style: dashed solid;
+        border-width: 16px;
+        border-image: url('./assets/border.png') 8 round;
+        image-rendering: pixelated;
+        border-radius: 18px;
+        display: none;
+        &.available-item{
+            display: flex;
+        }
+        >img{
+            image-rendering: pixelated;
+            width: 7em;
+            height: 7em;
+        }
+        >div{
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            >.store-item-title{
+                font-size: 3em;
+            }
+            >.store-item-desc{
+                font-size: 1.5em;
+            }
+        }
+        >table{
+            min-width: 15em;
+            border: none;
+            color: var(--color-fg-secondary);
+            th{
+                width: 4em;
+            }
+        }
+    }
+}
+& .settings-table{
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: 1fr;
+    & .table-header{
+        color: var(--color-fg-primary);
+        font-weight: 900;
+    }
+    & .table-cell{
+        color: var(--color-fg-secondary);
+    }
+}
+table{
+    th,td{
+        text-align: left;
+    }
+}
+button,input::-webkit-file-upload-button{
+    margin: 4px;
+    background-color: var(--color-bg-primary);
+    color: var(--color-fg-secondary);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--color-fg-secondary);
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 4px;
+    transition: background-color .25s ease, border-color .25s ease, color .25s ease;
+    &:focus, &:hover{
+        color: var(--color-bg-primary);
+        border-color: var(--color-bg-primary);
+        background-color: var(--color-fg-secondary);
+    }
+}
+input[type="file"]{
+    :is(&:focus, &:hover)::-webkit-file-upload-button{
+        color: var(--color-bg-primary);
+        border-color: var(--color-bg-primary);
+        background-color: var(--color-fg-secondary);
+    }
+}
+.bi-github{
+    color:#171515;
+}
+.coin-info{
+    min-width: 7em;
+}
+@media screen and (max-width: 1024px){
+    main{
+        flex-direction: column;
+    }
+    header{
+        flex-direction: column;
+    }
+    .store-pain{
+        height: unset;
+        overflow-y: auto;
+        & .store-items{
+            flex-direction: column;
+        }
+    }
+    .coin-info{
+        min-width: unset;
+    }
+    
+    & .settings-table{
+        display: flex;
+        flex-direction: column;
+        & .table-cell{
+            margin-left: 2em;
+        }
+    }
+}
