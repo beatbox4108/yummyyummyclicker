@@ -3,7 +3,7 @@ window.addEventListener("load",()=>{
     let cps=BigInt(0)
     let cpc=BigInt(1)
     let coins=BigInt(0)
-    let save_on_unload=true
+    let save_on_unload=false
 
     let clickAreaCandicates=[]
 
@@ -101,12 +101,22 @@ window.addEventListener("load",()=>{
         coins+=cps
         coinUpdate()
     },1000)
-    const save=()=>{
-        localStorage.setItem("clickersave",JSON.stringify({itemCounts:itemCounts,coins:coins.toString(),level:level,timestamp:Date.now()/1000}))
+    saveutil.save=()=>{
+        localStorage.setItem("clickersave",JSON.stringify(
+            {
+                version:1,
+                itemCounts:itemCounts,
+                coins:coins.toString(),
+                level:level,
+                timestamp:Date.now()/1000
+            }))
         document.getElementById("$SaveInfoSaveTime").textContent=Date()
     }
-    const load=()=>{
+    saveutil.load=()=>{
         if(localStorage.getItem("clickersave")){
+            if(saveutil.update_check()){
+                location.href="./updater.html#updater"
+            }
             savedata=JSON.parse(localStorage.getItem("clickersave"))
             itemCounts=savedata.itemCounts
             coins=BigInt(savedata.coins)
@@ -122,50 +132,16 @@ window.addEventListener("load",()=>{
             levelUp()
         }
     }
-    window.saveutil={}
-    saveutil.save=save
-    saveutil.load=load
-    saveutil.clear=()=>{
-        save_on_unload=false
-        if(confirm("セーブデータを削除してもよろしいですか?")){
-            if(confirm("この操作で次のデータが削除されます。\n- コイン、たべものを含む全てのゲームデータ\n次のデータは残ります。\n- 設定\n続行しますか?\nこの操作はバックアップをしていない限り元に戻せません。")){
-                localStorage.removeItem("clickersave")
-                if(confirm("データの削除が完了しました。このまま新しいゲームを開始しますか?")){
-                    location.reload(true)
-                }else{
-                    window.close()
-                }
-            }
-        }
-    }
-    saveutil.export=()=>{
-        const elem=document.createElement("a")
-        save()
-        elem.href=URL.createObjectURL(new Blob([window.btoa(localStorage.getItem("clickersave"))], { "type" : "text/plain" }))
-        elem.download="たべものクリッカーのセーブ.ymcsave"
-        elem.click()
-    }
-    saveutil.import=(e)=>{
-        if(e.files.length!=0){
-            const reader=new FileReader()
-            reader.readAsText(e.files[0])
-            reader.addEventListener("load",()=>{
-                if(confirm("現在のセーブを置き換える前に、現在のデータをエクスポートしますか?")){
-                    saveutil.export()
-                }
-                localStorage.setItem("clickersave",atob(reader.result))
-                save_on_unload=false
-                location.reload()
-            })
-        }
-    }
     
     document.getElementById("$PreferenceToggle").addEventListener("click",()=>{
         document.body.classList.toggle("settings-mode")
     })
     window.addEventListener("beforeunload",(e)=>{
-        if(save_on_unload){save()}
+        if(save_on_unload){saveutil.save()}
     })
-    load()
-    setTimeout(()=>{document.body.classList.remove("loading")},1000)
+    saveutil.load()
+    setTimeout(()=>{
+        save_on_unload=true
+        document.body.classList.remove("loading")
+    },1000)
 })

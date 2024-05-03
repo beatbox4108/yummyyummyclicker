@@ -17,6 +17,7 @@
     <meta property="og:image" content="https://yummyyummyclicker.beayon.xyz/logo.png" />
 
     <link rel="stylesheet" href="style.css">
+    <script src="savedata.js" defer></script>
     <script src="clicker.js"></script>
 </head>
 <body class="loading">
@@ -76,12 +77,10 @@
                     <legend>セーブデータの管理</legend>
                     <div class="settings-table">
                         <div div class="table-header">最終保存</div><div class="table-cell" id="$SaveInfoSaveTime">N/A</div>
-                        <div div class="table-header">セーブデータをエクスポート</div><div class="table-cell"><button type="button" onclick="saveutil.export()">エクスポート</button></div>
-                        <div div class="table-header">セーブデータをインポート</div><div class="table-cell"><input type="file" oninput="saveutil.import(this)"></div>
+                        <div div class="table-header"></div><div class="table-cell"><a href="./updater.html"><button type="button">セーブデータマネージャーを開く</button></a></div>
                     </div>
                 </fieldset>
                 <div>
-                    <button type="button" onclick="saveutil.clear()">セーブデータをリセット</button>
                     <button type="button" onclick="saveutil.save()">直ちにセーブ</button>
                     <button type="button" onclick="saveutil.load()">直ちにロード</button>
                 </div>

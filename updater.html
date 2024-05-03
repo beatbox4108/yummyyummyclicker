@@ -1,0 +1,259 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>たべものクリッカー！セーブデータマネージャー</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Hachi Maru Pop", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+
+            /*
+            *Palette from https://www.canva.com/colors/color-palettes/cupcake-delight/ 
+            */
+            /*Champagne*/
+            --color-bg-primary:#EBE0D0;
+            /*Hot Pink*/
+            --color-bg-secondary:#EC9EC0;
+            /*Fuchsia*/
+            --color-fg-primary:#FF0080;
+            /*Pink*/
+            --color-fg-secondary:#A91B60;
+        }
+        body{
+            padding: 0;
+            background-color: var(--color-bg-primary);
+            color: var(--color-fg-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        main{
+            display: inline-block;
+        }
+        main>div, .dialog{
+            text-align: center;
+            width: 100%;
+            display: none;
+            &:target,&:has(*:target){
+                display: block;
+            }
+        }
+        main:not(:has(*:target))>#welcome{
+            display: block;
+        }
+        .title{
+            font-size: 2em;
+            &,& *{
+                font-weight: 900;
+            }
+        }
+        .title,p{
+            & span{
+                display: inline-block;
+            }
+        }
+        strong{
+            font-weight: bolder;
+            text-decoration: underline;
+        }
+        .switch{
+            display: flex;
+            justify-content: space-around;
+        }
+        button,input::-webkit-file-upload-button{
+            margin: 4px;
+            background-color: var(--color-bg-primary);
+            color: var(--color-fg-secondary);
+            border-width: 1px;
+            border-style: solid;
+            border-color: var(--color-fg-secondary);
+            box-sizing: border-box;
+            border-radius: 4px;
+            padding: 4px;
+            transition: background-color .25s ease, border-color .25s ease, color .25s ease;
+            &:focus, &:hover{
+                color: var(--color-bg-primary);
+                border-color: var(--color-bg-primary);
+                background-color: var(--color-fg-secondary);
+            }
+        }
+        input[type="file"]{
+            :is(&:focus, &:hover)::-webkit-file-upload-button{
+                color: var(--color-bg-primary);
+                border-color: var(--color-bg-primary);
+                background-color: var(--color-fg-secondary);
+            }
+        }
+    </style>
+    <script src="./savedata.js" defer></script>
+    <script>
+        latest_version=1
+        update_save=(save)=>{
+            if(save.version==0){
+                save.version=1
+                return true
+            }
+            if(save.version>=latest_version){
+                return false
+            }
+        }
+        execute_action=()=>{
+            hash=location.hash
+            if(hash=="#updater"){
+                if(saveutil.update_check()){
+                    document.getElementById("$version_old").textContent=saveutil.version_check()
+                    document.getElementById("$version_new").textContent=latest_version
+                    location.hash="#update-found"
+                    document.getElementById("$applied").textContent=0
+                }else{
+                    location.hash="#update-cancel"
+                }
+            }else if(hash=="#updating"){
+                let save=saveutil.get_save()
+                save.version=saveutil.version_check()
+                console.log(save.version)
+                applied=0
+                update=()=>{
+                    if(update_save(save)){
+                        applied++
+                        document.getElementById("$applied").textContent=applied
+                        setTimeout(update,10)
+                    }else{
+                        document.getElementById("$applied").textContent=applied
+                        localStorage.setItem("clickersave",JSON.stringify(save))
+                        location.hash="#update-complete"
+                    }
+                }
+                update()
+            }else if(hash=="#clear-execute"){
+                saveutil.clear()
+            }
+        }
+        window.addEventListener("hashchange",execute_action)
+        window.addEventListener("DOMContentLoaded",execute_action)
+    </script>
+</head>
+<body>
+    <main>
+        <div id="welcome">
+            <div class="title"><span>たべものクリッカー！</span><span>セーブデータマネージャー</span></div>
+            <div class="switch">
+                <a href="#import-confirm"><button type="button">セーブデータをインポート</button></a>
+                <a href="#export"><button type="button">セーブデータをエクスポート(バックアップ)</button></a>
+                <a href="#clear"><button type="button">データを削除</button></a>
+                <a href="#updater"><button type="button">アップデート</button></a>
+            </div>
+        </div>
+        <div id="export">
+            <div class="title">セーブデータをエクスポート(バックアップ)</div>
+            <p>データをエクスポートしてバックアップできます。</p>
+            <div class="switch">
+                <a href="#"><button type="button">戻る</button></a>
+                <button type="button" onclick="saveutil.export()">データをエクスポート</button>
+            </div>
+        </div>
+        <div id="clear-execute">
+            <div class="title">セーブデータを削除</div>
+            <p>セーブデータを削除しました。</p>
+            <div class="switch">
+                <a href="#"><button type="button">戻る</button></a>
+                <a href="./index.html"><button type="button">新しいゲームを開始</button></a>
+            </div>
+        </div>
+        <div>
+            <div class="title">セーブデータを削除</div>
+            <p class="title">
+                セーブデータを削除すると、次のデータは消去されます。
+            </p>
+            <ul>
+                <li>これまでに集めた<strong>コイン</strong>、<strong>たべもの</strong>を含む<strong>全ての進行状況データ</strong></li>
+            </ul>
+            <p class="title">
+                次のデータは保持されます。
+            </p>
+            <ul>
+                <li>設定データ</li>
+            </ul>
+            <div class="dialog" id="clear">
+                <p>上記内容を確認して、「上記の内容を確認して続ける」を押してください。</p>
+                <p>後からデータを戻す場合は、「バックアップへ進む」を選択してください。</p>
+                <div class="switch">
+                    <a href="#"><button type="button">キャンセル</button></a>
+                    <a href="#export"><button type="button">バックアップへ進む</button></a>
+                    <a href="#clear-confirm"><button type="button">上記の内容を確認して続ける</button></a>
+                </div>
+            </div>
+            <div class="dialog" id="clear-confirm">
+                <div class="switch">
+                    <a href="#"><button type="button" class="title">キャンセル</button></a>
+                </div>
+                <a href="#clear-execute">上記の内容を確認して削除を実行</a>
+            </div>
+        </div>
+        <div>
+            <div class="title">セーブデータのインポート</div>
+            <div class="dialog" id="import-confirm">
+                <p><span>セーブデータのインポートを行うと、</span><span>バックアップを行わない限り、</span><span>データは<strong>恒久的に削除</strong>され、</span><span><strong>元に戻せません</strong>。</span></p>
+
+                
+                <div class="switch">
+                    <a href="#"><button type="button">キャンセル</button></a>
+                    <a href="#export"><button type="button">バックアップを作成</button></a>
+                    <a href="#import"><button type="button">進む</button></a>
+                </div>
+            </div>
+            <div class="dialog" id="import">
+                <p>以下でファイルを選択してください。</p>
+                <input type="file" onchange="saveutil.import(this)" accept=".ymcsave, .ymcsave.txt">
+            </div>
+            <div class="dialog" id="import-complete">
+                <p>インポートを完了しました。</p>
+                <div class="switch">
+                    <a href="#updater"><button type="button">このまま起動</button></a>
+                    <a href="#"><button type="button">メニューへ戻る</button></a>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="title">セーブデータのアップデート</div>
+            <div class="dialog" id="updater">
+                <p>アップデートを確認中...</p>
+            </div>
+            <div class="dialog" id="update-found">
+                <p>アップデートが見つかりました。</p>
+                <p>プレイするにはセーブデータのアップデートをする必要があります。</p>
+                <p>旧バージョン (<span id="$version_old"></span>) ⇒ (<span id="$version_new"></span>) 新バージョン</p>
+                <div class="switch">
+                    <a href="#export"><button type="button">バックアップへ進む</button></a>
+                    <a href="#updating"><button type="button">アップデートを開始</button></a>
+                </div>
+            </div>
+            <div class="dialog" id="update-cancel">
+                <p>アップデートの必要はありません。</p>
+                <div class="switch">
+                    <a href="#"><button type="button">セーブデータマネージャーへ戻る</button></a>
+                    <a href="./index.html"><button type="button">ゲームを起動</button></a>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="title">アップデートを適用</div>
+            <div><span id="$applied"></span>個適用済み</div>
+            <div class="dialog" id="updating">
+                <p>アップデート中... しばらくお待ちください。</p>
+            </div>
+            <div class="dialog" id="update-complete">
+                <p>アップデートが完了しました。</p>
+                <div class="switch">
+                    <a href="./index.html"><button type="button">続行</button></a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
