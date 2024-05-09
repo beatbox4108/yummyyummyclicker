@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Hachi Maru Pop", sans-serif;
+            font-weight: 900;
+            font-style: normal;
+            /*
+            *Palette from https://www.canva.com/colors/color-palettes/cupcake-delight/ 
+            */
+            
+            /*Champagne*/
+            --color-bg-primary:#EBE0D0;
+
+            /*Hot Pink*/
+            --color-bg-secondary:#EC9EC0;
+
+            /*Fuchsia*/
+            --color-fg-primary:#FF0080;
+
+            /*Pink*/
+            --color-fg-secondary:#A91B60;
+        }
+        body{
+            background-color: var(--color-bg-primary);
+            color: var(--color-fg-primary);
+            margin: 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        main{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: stretch;
+            width: 30%;
+            min-width: 768px;
+            & div{
+                background-image: url(https://github.com/SAWARATSUKI/KawaiiLogos/blob/main/ResponseCode/404%20NotFound.png?raw=true);
+                background-size: contain;
+                aspect-ratio: 1920/1080;
+                background-color: white;
+                border-radius: 5vw;
+                width: 100%;
+            }
+        }
+        @media screen and (max-width: 768px){
+            main{
+                width: 80%;
+                min-width: 0;
+            }
+        }
+        button,input::-webkit-file-upload-button{
+            margin: 4px;
+            background-color: var(--color-bg-primary);
+            color: var(--color-fg-secondary);
+            border-width: 1px;
+            border-style: solid;
+            border-color: var(--color-fg-secondary);
+            box-sizing: border-box;
+            border-radius: 4px;
+            padding: 4px;
+            transition: background-color .25s ease, border-color .25s ease, color .25s ease;
+            &:focus, &:hover{
+                color: var(--color-bg-primary);
+                border-color: var(--color-bg-primary);
+                background-color: var(--color-fg-secondary);
+            }
+        }
+        .switch{
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+        hr{
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid var(--color-bg-secondary);
+            background-color: transparent;
+        }
+        a{
+            color: var(--color-fg-secondary);
+        }
+    </style>
+</head>
+<body>
+    <main>
+
+    
+        <h1>404 Not Found</h1>
+        <div></div>
+        <p>Image by <a href="https://github.com/SAWARATSUKI/KawaiiLogos">SAWARATSUKI</a></p>
+        <h3>もしかして</h3>
+        <section class="switch">
+            <a href="/index.html"><button type="button">たべものクリッカー！を起動</button></a>
+            <a href="/updater.html"><button type="button">セーブデータマネージャーを起動</button></a>
+        </section>
+        <hr>
+        <p>たべものクリッカー！</p>
+        <section class="switch">
+            <a href="https://github.com/beatbox4108/yummyyummyclicker">Github</a>
+            <a href="https://github.com/beatbox4108">びーよん！</a>
+        </section>
+        
+    </main>
+</body>
+</html>
