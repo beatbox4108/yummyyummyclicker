@@ -1,9 +1,14 @@
+const zip = (a, b) => Array.from(Array(Math.min(b.length, a.length)), (_, i) => [a[i], b[i]]);
+var configUtil={}
 window.addEventListener("load",()=>{
     let level=0
     let cps=BigInt(0)
     let cpc=BigInt(1)
     let coins=BigInt(0)
     let save_on_unload=false
+    let configuration={
+        numberFormat:3
+    }
 
     let clickAreaCandicates=[]
 
@@ -24,9 +29,46 @@ window.addEventListener("load",()=>{
     let itemCounts=[
     ]
 
+    const formatUnits=(num,units,actualAmount)=>{
+        unit=""
+        numAppliedUnit=num
+        zip(units,actualAmount).reverse().some(e=>{
+            if(10n**BigInt(e[1])<=num){
+                unit=e[0]
+                numAppliedUnit=Number(BigInt(num)/10n**BigInt(e[1]-2))/(10**2)
+                return true
+            }
+        })
+        return numAppliedUnit+unit
+    }
+    
+    const coinFormat=(num)=>{
+        formatType=configuration.numberFormat
+        if(formatType==0){
+            return num.toString()
+        }
+        if(formatType==1){
+            units= ["million","billion","trillion","quadrillion","quintillion","sextillion","septillion","octillion","nonillion","decillion",
+                    "undecillion","duodecillion","tredecillion","quattuordecillion","quindecillion","sexdecillion","septendecillion","octodecillion","novemdecillion"]
+            actualAmount=[6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60]
+            return formatUnits(num,units,actualAmount)
+        }
+        if(formatType==2){
+            units= ["万","億","兆","京","垓","𥝱","穣","溝","澗","正","載","極"]
+            actualAmount=[4,8,12,16,20,24,28,32,36,40,44,48]
+            return formatUnits(num,units,actualAmount)
+        }
+        if(formatType==3){
+            units= ["K","M","G","T","P","E","Z","Y","R","Q"]
+            actualAmount=[3,6,9,12,15,18,21,24,27,30]
+            return formatUnits(num,units,actualAmount)
+        }
+        return num.toLocaleString()
+    }
+
     const $coinValue=document.getElementById("coin-value")
     const coinUpdate=()=>{
-        $coinValue.textContent=coins
+        $coinValue.textContent=coinFormat(coins)
     }
     const costUpdate=(id)=>{
         itemCounts[id].cost=Math.floor(storeItems[id].cost*(1.15**(itemCounts[id].count)))
@@ -43,9 +85,9 @@ window.addEventListener("load",()=>{
         })
         cps=BigInt(Math.floor(new_cps))
         cpc=BigInt(new_cpc)
-        document.getElementById("cps-value").textContent=cps
-        document.getElementById("cpc-value").textContent=cpc
-        document.querySelector(`.store-items[data-level="${id}"] .store-item-cost`).textContent=itemCounts[id].cost
+        document.getElementById("cps-value").textContent=coinFormat(cps)
+        document.getElementById("cpc-value").textContent=coinFormat(cpc)
+        document.querySelector(`.store-items[data-level="${id}"] .store-item-cost`).textContent=coinFormat(itemCounts[id].cost)
         document.querySelector(`.store-items[data-level="${id}"] .store-item-count`).textContent=itemCounts[id].count
     }
 
@@ -81,6 +123,13 @@ window.addEventListener("load",()=>{
         coinUpdate()
     }
 
+    configUtil.numberFormat=(x)=>{
+        configuration.numberFormat=x;
+        for(let i=0;i<itemCounts.length;i++){
+            costUpdate(i)
+        }
+    }
+
     window.pref={}
 
     storeItems.forEach((e)=>{
@@ -104,7 +153,8 @@ window.addEventListener("load",()=>{
     saveutil.save=()=>{
         localStorage.setItem("clickersave",JSON.stringify(
             {
-                version:1,
+                version:saveutil.latest_version,
+                configs:configuration,
                 itemCounts:itemCounts,
                 coins:coins.toString(),
                 level:level,
@@ -121,7 +171,10 @@ window.addEventListener("load",()=>{
             itemCounts=savedata.itemCounts
             coins=BigInt(savedata.coins)
             level=savedata.level
+            configuration=savedata.configs
             levelFix()
+
+            document.querySelector(`.number-format>option[value="${configuration.numberFormat}"]`).selected=true
         
             document.getElementById("$SaveInfoLastSaveTime").textContent=document.getElementById("$SaveInfoSaveTime").textContent=new Date(savedata.timestamp*1000).toString()
             document.getElementById("$SaveInfoLastSaveCoin").textContent=coins
