@@ -104,7 +104,10 @@ window.addEventListener("load",()=>{
     saveutil.save=()=>{
         localStorage.setItem("clickersave",JSON.stringify(
             {
-                version:1,
+                version:saveutil.latest_version,
+                configs:{
+                    numberFormat: 3
+                },
                 itemCounts:itemCounts,
                 coins:coins.toString(),
                 level:level,
@@ -121,6 +124,7 @@ window.addEventListener("load",()=>{
             itemCounts=savedata.itemCounts
             coins=BigInt(savedata.coins)
             level=savedata.level
+            configs=savedata.configs
             levelFix()
         
             document.getElementById("$SaveInfoLastSaveTime").textContent=document.getElementById("$SaveInfoSaveTime").textContent=new Date(savedata.timestamp*1000).toString()

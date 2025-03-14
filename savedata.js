@@ -1,4 +1,5 @@
 window.saveutil={}
+saveutil.latest_version=2.001
 saveutil.clear=()=>{
     localStorage.removeItem("clickersave")
 }
@@ -27,7 +28,6 @@ saveutil.version_check=()=>{
     return 0
 }
 saveutil.update_check=()=>{
-    latest_version=1
-    return saveutil.version_check()<latest_version
+    return saveutil.version_check()<saveutil.latest_version
 }
 saveutil.get_save=()=>JSON.parse(localStorage.getItem("clickersave"))
