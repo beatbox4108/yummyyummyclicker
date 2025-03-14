@@ -1,9 +1,14 @@
+const zip = (a, b) => Array.from(Array(Math.min(b.length, a.length)), (_, i) => [a[i], b[i]]);
+
 window.addEventListener("load",()=>{
     let level=0
     let cps=BigInt(0)
     let cpc=BigInt(1)
     let coins=BigInt(0)
     let save_on_unload=false
+    let configuration={
+        numberFormat:3
+    }
 
     let clickAreaCandicates=[]
 
@@ -24,9 +29,33 @@ window.addEventListener("load",()=>{
     let itemCounts=[
     ]
 
+
+    
+    const coinFormat=(num)=>{
+        formatType=configuration.numberFormat
+        if(formatType==0){
+            return num.toString()
+        }
+        if(formatType==1){
+            units= ["million","billion","trillion","quadrillion","quintillion","sextillion","septillion","octillion","nonillion","decillion",
+                    "undecillion","duodecillion","tredecillion","quattuordecillion","quindecillion","sexdecillion","septendecillion","octodecillion","novemdecillion"]
+            actualAmount=[6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60]
+            unit=""
+            numAppliedUnit=num
+            zip(units,actualAmount).reverse().some(e=>{
+                if(10n**e[1]<=num){
+                    unit=e[0]
+                    numAppliedUnit=Number(BigInt(num)/10n**BigInt(e[1]-3))/(10**3)
+                    return true
+                }
+            })
+            return numAppliedUnit+unit
+        }
+    }
+
     const $coinValue=document.getElementById("coin-value")
     const coinUpdate=()=>{
-        $coinValue.textContent=coins
+        $coinValue.textContent=coinFormat(coins)
     }
     const costUpdate=(id)=>{
         itemCounts[id].cost=Math.floor(storeItems[id].cost*(1.15**(itemCounts[id].count)))
@@ -105,9 +134,7 @@ window.addEventListener("load",()=>{
         localStorage.setItem("clickersave",JSON.stringify(
             {
                 version:saveutil.latest_version,
-                configs:{
-                    numberFormat: 3
-                },
+                configs:configuration,
                 itemCounts:itemCounts,
                 coins:coins.toString(),
                 level:level,
@@ -124,7 +151,7 @@ window.addEventListener("load",()=>{
             itemCounts=savedata.itemCounts
             coins=BigInt(savedata.coins)
             level=savedata.level
-            configs=savedata.configs
+            configuration=savedata.configs
             levelFix()
         
             document.getElementById("$SaveInfoLastSaveTime").textContent=document.getElementById("$SaveInfoSaveTime").textContent=new Date(savedata.timestamp*1000).toString()
