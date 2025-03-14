@@ -86,6 +86,19 @@
                 </div>
             </section>
             <section>
+                <h3>表示設定</h3>
+                <label>
+                    数値の表示方式
+                    <select class="number-format" name="number-format" onchange="configUtil.numberFormat(Number(this.value))">
+                        <option value="0">表示を整形しない</option>
+                        <option value="1">Short Scale</option>
+                        <option value="2">万進法</option>
+                        <option value="3" selected>SI単位</option>
+                        <option value="4">カンマ区切り</option>
+                    </select>
+                </label>
+            </section>
+            <section>
                 <h3>バージョン情報</h3>
                 <div>
                     <img src="/banner.png" style="width: 100%;max-width:728px;">
