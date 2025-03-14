@@ -90,9 +90,9 @@
             }
         }
     </style>
-    <script src="./savedata.js" defer></script>
+    <script src="./savedata.js"></script>
     <script>
-        latest_version=1
+        latest_version=saveutil.latest_version
         update_save=(save)=>{
             if(save.version==0){
                 save.version=1
