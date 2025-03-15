@@ -186,8 +186,21 @@ window.addEventListener("load",()=>{
         }
     }
     
-    document.getElementById("$PreferenceToggle").addEventListener("click",()=>{
-        document.body.classList.toggle("settings-mode")
+    $PreferenceToggle.addEventListener("change",e=>{
+        if(e.target.checked){
+            document.body.dataset.selectedPain="settings"
+            $StatisticsToggle.checked=false
+        }else{
+            document.body.dataset.selectedPain=""
+        }
+    })
+    $StatisticsToggle.addEventListener("change",e=>{
+        if(e.target.checked){
+            document.body.dataset.selectedPain="statistics"
+            $PreferenceToggle.checked=false
+        }else{
+            document.body.dataset.selectedPain=""
+        }
     })
     window.addEventListener("beforeunload",(e)=>{
         if(save_on_unload){saveutil.save()}
