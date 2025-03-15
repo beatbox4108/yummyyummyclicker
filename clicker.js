@@ -191,7 +191,7 @@ window.addEventListener("load",()=>{
             document.body.dataset.selectedPain="settings"
             $StatisticsToggle.checked=false
         }else{
-            document.body.dataset.selectedPain=""
+            delete document.body.dataset.selectedPain
         }
     })
     $StatisticsToggle.addEventListener("change",e=>{
@@ -199,7 +199,7 @@ window.addEventListener("load",()=>{
             document.body.dataset.selectedPain="statistics"
             $PreferenceToggle.checked=false
         }else{
-            document.body.dataset.selectedPain=""
+            delete document.body.dataset.selectedPain
         }
     })
     window.addEventListener("beforeunload",(e)=>{

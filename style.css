@@ -89,7 +89,7 @@ a{
     user-select: none;
 }
 .click-pain{
-    flex-grow: 2;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     div{
@@ -108,6 +108,23 @@ a{
 .link-list{
     display: flex;
     font-size: 1.5em;
+    &>*{
+        display: inline-block;
+        height: 1.5em;
+        width: 1.5em;
+        color: var(--color-fg-secondary);
+    }
+    & label{
+        border-radius: 15%;
+        
+        &:has(>input:checked){
+            background-color: var(--color-bg-primary);
+            color: var(--color-fg-primary);
+        }
+        & input[type=checkbox]{
+            display: none;
+        }
+    }
 }
 .click-info-wrapper, .link-list-wrapper{
     display: flex;
@@ -133,85 +150,82 @@ a{
     }
 }
 .settings-pain{
-    flex-grow: 5;
+    image-rendering: pixelated;
+    label{
+        display: block;
+    }
+    .settings-table{
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        grid-template-rows: 1fr;
+        & .table-header{
+            color: var(--color-fg-primary);
+            font-weight: 900;
+        }
+        & .table-cell{
+            color: var(--color-fg-secondary);
+        }
+    }
+}
+.store-pain,.settings-pain,.statistics-pain{
     display: none;
+    width: 70%;
+    box-sizing: border-box;
+    overflow-y: scroll;
+    height: calc(100% - 16px);
+    padding: 16px;
+    >header{
+        font-size: 2em;
+        font-weight: 900;
+    }
+}
+body:not([data-selected-pain]) .store-pain{
+    display: block;
+}
+body[data-selected-pain=settings] .settings-pain{
+    display: block;
+}
+body[data-selected-pain=statistics] .statistics-pain{
+    display: block;
+}
+
+.store-pain .store-items{
     margin: 16px;
     border-style: dashed solid;
     border-width: 16px;
     border-image: url('./assets/border.png') 8 round;
     image-rendering: pixelated;
-    padding: 1em;
-    >header{
-        font-size: 2em;
-        font-weight: 900;
+    border-radius: 18px;
+    display: none;
+    &.available-item{
+        display: flex;
     }
-    label{
-        display: block;
-    }
-}
-.settings-mode{
-    
-    .store-pain{
-        display: none;
-    }
-    .settings-pain{
-        display: block;
-    }
-    
-}
-.store-pain{
-    flex-grow: 5;
-    overflow-y: scroll;
-    height: calc(100vh - (16px + 4em));
-    .store-items{
-        margin: 16px;
-        border-style: dashed solid;
-        border-width: 16px;
-        border-image: url('./assets/border.png') 8 round;
+    >img{
         image-rendering: pixelated;
-        border-radius: 18px;
-        display: none;
-        &.available-item{
-            display: flex;
+        width: 7em;
+        height: 7em;
+    }
+    >div{
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        >.store-item-title{
+            font-size: 3em;
         }
-        >img{
-            image-rendering: pixelated;
-            width: 7em;
-            height: 7em;
-        }
-        >div{
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            >.store-item-title{
-                font-size: 3em;
-            }
-            >.store-item-desc{
-                font-size: 1.5em;
-            }
-        }
-        >table{
-            min-width: 15em;
-            border: none;
-            color: var(--color-fg-secondary);
-            th{
-                width: 4em;
-            }
+        >.store-item-desc{
+            font-size: 1.5em;
         }
     }
-}
-& .settings-table{
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    grid-template-rows: 1fr;
-    & .table-header{
-        color: var(--color-fg-primary);
-        font-weight: 900;
-    }
-    & .table-cell{
+    >table{
+        min-width: 15em;
+        border: none;
         color: var(--color-fg-secondary);
+        th{
+            width: 4em;
+        }
     }
 }
+
 table{
     th,td{
         text-align: left;
@@ -249,17 +263,22 @@ input[type="file"]{
 }
 @media screen and (max-width: 1024px){
     main{
+        overflow-y: scroll;
         flex-direction: column;
     }
     header{
         flex-direction: column;
     }
-    .store-pain{
+    .click-pain{
+        flex-grow: 0;
+    }
+    .store-pain,.settings-pain,.statistics-pain{
         height: unset;
-        overflow-y: auto;
-        & .store-items{
-            flex-direction: column;
-        }
+        overflow-y: visible;
+        width: 100%;
+    }
+    .store-pain .store-items{
+        flex-direction: column;
     }
     .coin-info{
         min-width: unset;
